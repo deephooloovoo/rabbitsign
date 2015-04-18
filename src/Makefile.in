@@ -26,7 +26,7 @@ VPATH = @srcdir@
 rabbitsign_objects = rabbitsign.@OBJEXT@
 packxxk_objects = packxxk.@OBJEXT@
 rskeygen_objects = rskeygen.@OBJEXT@
-librabbitsign_objects = app8x.@OBJEXT@ app9x.@OBJEXT@ apps.@OBJEXT@ autokey.@OBJEXT@ cmdline.@OBJEXT@ error.@OBJEXT@ graphlink.@OBJEXT@ header.@OBJEXT@ input.@OBJEXT@ keys.@OBJEXT@ mem.@OBJEXT@ os8x.@OBJEXT@ output.@OBJEXT@ output8x.@OBJEXT@ output9x.@OBJEXT@ program.@OBJEXT@ rabin.@OBJEXT@ rsa.@OBJEXT@ typestr.@OBJEXT@ md5.@OBJEXT@ sha256.@OBJEXT@ sha256-crypt.@OBJEXT@ @mpzobjs@
+librabbitsign_objects = app8x.@OBJEXT@ app9x.@OBJEXT@ apps.@OBJEXT@ autokey.@OBJEXT@ cmdline.@OBJEXT@ error.@OBJEXT@ graphlink.@OBJEXT@ header.@OBJEXT@ input.@OBJEXT@ keys.@OBJEXT@ mem.@OBJEXT@ os8x.@OBJEXT@ output.@OBJEXT@ output8x.@OBJEXT@ output9x.@OBJEXT@ program.@OBJEXT@ rabin.@OBJEXT@ rsa.@OBJEXT@ typestr.@OBJEXT@ md5.@OBJEXT@ sha256.@OBJEXT@ @mpzobjs@
 
 all: rabbitsign@EXEEXT@ packxxk@EXEEXT@ @opt_build_rskeygen@
 
