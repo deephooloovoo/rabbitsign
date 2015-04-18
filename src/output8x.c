@@ -204,7 +204,7 @@ int rs_write_ti8x_file(const RSProgram* prgm,  /* program */
 		 + nrecords * 13 - 2);
     }
 
-    if ((e = rs_write_tifl_header(outfile, 1, major, minor,
+    if ((e = rs_write_tifl_header(outfile, !(flags & RS_OUTPUT_BINARY), major, minor,
 				  month, day, year, name,
 				  prgm->calctype, prgm->datatype,
 				  hexsize)))

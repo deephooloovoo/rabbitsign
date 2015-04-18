@@ -77,6 +77,7 @@ int rs_write_tifl_header(FILE* outfile,    /* file to write to */
     buf[11] = 0x88;
   }
   else {
+    buf[73] = 0x13;
     buf[10] = 0;
     buf[11] = 0;
   }
