@@ -1,0 +1,75 @@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+datarootdir = @datarootdir@
+bindir = @bindir@
+datadir = @datadir@
+mandir = @mandir@
+app_key_dir = ${datadir}/rabbitsign
+
+AR = @AR@
+CC = @CC@
+CFLAGS = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@
+DEFS = @DEFS@
+GMP_CFLAGS = @GMP_CFLAGS@
+GMP_LIBS = @GMP_LIBS@
+INSTALL = @INSTALL@
+LDFLAGS = @LDFLAGS@
+LIBS = @LIBS@
+RANLIB = @RANLIB@
+SHELL = /bin/sh
+
+@SET_MAKE@
+srcdir = @srcdir@
+VPATH = @srcdir@
+
+distname = @PACKAGE_TARNAME@-@PACKAGE_VERSION@
+
+all:
+	cd src && $(MAKE)
+
+clean:
+	cd src && $(MAKE) clean
+	cd test && $(MAKE) clean
+
+distclean: clean
+	rm -f test/failed.hex
+	rm -f config.h config.status config.log
+	rm -rf autom4te.cache
+	rm -rf $(distname)
+	rm -f $(distname).tar.gz
+	rm -f man/Makefile src/Makefile test/Makefile
+	rm -f Makefile
+
+install:
+	cd src && $(MAKE) install
+	cd man && $(MAKE) install
+
+uninstall:
+	cd src && $(MAKE) uninstall
+	cd man && $(MAKE) uninstall
+
+docs:
+	cd man && $(MAKE)
+
+check:
+	cd test && $(MAKE) check
+
+dist:
+	rm -rf $(distname)
+	mkdir $(distname)
+	mkdir $(distname)/src
+	mkdir $(distname)/man
+	mkdir $(distname)/keys
+	mkdir $(distname)/test
+	for i in COPYING Makefile.in README config.h.in \
+	 configure configure.ac install-sh \
+	 src/*.c src/*.h src/Makefile.in \
+	 man/*.1 man/*.pdf man/Makefile.in \
+	 keys/README keys/*.key keys/*.pub \
+	 test/*.c test/*.sh test/sample.hex \
+	 test/sample-a.app test/Makefile.in ; \
+	 do cp -p $(srcdir)/$$i $(distname)/$$i ; done
+	tar cfvz $(distname).tar.gz $(distname)
+
+.PHONY: all clean distclean install uninstall docs check dist

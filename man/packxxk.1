@@ -1,0 +1,53 @@
+.TH packxxk 1 "July 2009" "RabbitSign 2.0"
+.SH NAME
+packxxk \- pack TI graphing calculator software files
+
+.SH SYNOPSIS
+\fBpackxxk\fR [ \fB-t\fR \fItype\fR ] [ \fB-d\fR \fIdate\fR ]
+[ \fB-o\fR \fIxxkfile\fR ] \fIappfile\fR ...
+
+.SH DESCRIPTION
+\fBpackxxk\fR is a program to generate Flash Application and OS files
+for the Texas Instruments TI-73, TI-83 Plus, TI-84 Plus, TI-89, and
+TI-92 Plus graphing calculators.  The files generated are in the
+``TIFL'' format used by recent versions of TI's GraphLink and
+TI-Connect software.
+
+The input file to \fBpackxxk\fR must be in TI-Hex or TIFL format to
+begin with, and (in order for the application to be installed) it must
+have been digitally signed before being packed.  \fBpackxxk\fR does
+not do this, nor does it check for the presence of a signature.  You
+can use \fBrabbitsign\fR(1) to sign applications in several common
+formats.
+
+If multiple input files are specified, \fBpackxxk\fR creates a
+multi-part TIFL file.
+
+.SS OPTIONS
+.TP
+\fB-t\fR \fItype\fR
+Specify the type of program (e.g., `8xk' for a TI-83 Plus application,
+or `73u' for a TI-73 operating system.)  The default behavior is to
+infer the program type from the name of the input file.  (If the input
+file does not have a recognized suffix, the type is guessed based on
+the contents of the program header.)
+
+.TP
+\fB-c\fR \fIid\fR
+Manually specify the calculator device ID (e.g., 0x73 for the TI-83
+Plus, or 0x74 for the TI-73.)
+
+.TP
+\fB-d\fR [ \fImonth\fR/\fIday\fR/\fIyear\fR | \fIday\fR-\fImonth\fR-\fIyear\fR ]
+Manually specify the date stamp for the application.  The default is
+to use the current date in the local time zone.
+
+.TP
+\fB-o\fR \fIxxkfile\fR
+Specify the output file name (default is to write to standard output.)
+
+.SH SEE ALSO
+\fBrabbitsign\fR(1)
+
+.SH AUTHOR
+Benjamin Moody <floppusmaximus@users.sf.net>

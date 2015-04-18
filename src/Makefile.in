@@ -1,0 +1,147 @@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+datarootdir = @datarootdir@
+bindir = @bindir@
+datadir = @datadir@
+mandir = @mandir@
+app_key_dir = ${datadir}/rabbitsign
+
+AR = @AR@
+CC = @CC@
+CFLAGS = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@
+DEFS = @DEFS@
+GMP_CFLAGS = @GMP_CFLAGS@
+GMP_LIBS = @GMP_LIBS@
+INSTALL = @INSTALL@
+LDFLAGS = @LDFLAGS@
+LIBS = @LIBS@
+RANLIB = @RANLIB@
+SHELL = /bin/sh
+
+@SET_MAKE@
+srcdir = @srcdir@
+VPATH = @srcdir@
+
+rabbitsign_objects = rabbitsign.@OBJEXT@
+packxxk_objects = packxxk.@OBJEXT@
+rskeygen_objects = rskeygen.@OBJEXT@
+librabbitsign_objects = app8x.@OBJEXT@ app9x.@OBJEXT@ apps.@OBJEXT@ autokey.@OBJEXT@ cmdline.@OBJEXT@ error.@OBJEXT@ graphlink.@OBJEXT@ header.@OBJEXT@ input.@OBJEXT@ keys.@OBJEXT@ mem.@OBJEXT@ os8x.@OBJEXT@ output.@OBJEXT@ output8x.@OBJEXT@ output9x.@OBJEXT@ program.@OBJEXT@ rabin.@OBJEXT@ rsa.@OBJEXT@ typestr.@OBJEXT@ md5.@OBJEXT@ sha256.@OBJEXT@ sha256-crypt.@OBJEXT@ @mpzobjs@
+
+all: rabbitsign@EXEEXT@ packxxk@EXEEXT@ @opt_build_rskeygen@
+
+.PHONY: all clean install install-rskeygen uninstall
+
+
+rabbitsign@EXEEXT@: $(rabbitsign_objects) librabbitsign.a
+	$(CC) $(CFLAGS) $(LDFLAGS) $(rabbitsign_objects) -L. -lrabbitsign $(GMP_LIBS) $(LIBS) -o rabbitsign@EXEEXT@
+
+packxxk@EXEEXT@: $(packxxk_objects) librabbitsign.a
+	$(CC) $(CFLAGS) $(LDFLAGS) $(packxxk_objects) -L. -lrabbitsign $(GMP_LIBS) $(LIBS) -o packxxk@EXEEXT@
+
+rskeygen@EXEEXT@: $(rskeygen_objects)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(rskeygen_objects) $(GMP_LIBS) $(LIBS) -o rskeygen@EXEEXT@
+
+librabbitsign.a: $(librabbitsign_objects)
+	$(AR) cru librabbitsign.a $(librabbitsign_objects)
+	$(RANLIB) librabbitsign.a
+
+
+rabbitsign.@OBJEXT@: rabbitsign.c rabbitsign.h internal.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/rabbitsign.c
+
+packxxk.@OBJEXT@: packxxk.c rabbitsign.h internal.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/packxxk.c
+
+rskeygen.@OBJEXT@: rskeygen.c ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/rskeygen.c
+
+
+app8x.@OBJEXT@: app8x.c rabbitsign.h internal.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/app8x.c
+
+app9x.@OBJEXT@: app9x.c rabbitsign.h internal.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/app9x.c
+
+apps.@OBJEXT@: apps.c rabbitsign.h internal.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/apps.c
+
+autokey.@OBJEXT@: autokey.c rabbitsign.h internal.h autokeys.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -DSHARE_DIR=\"$(app_key_dir)/\" -c $(srcdir)/autokey.c
+
+cmdline.@OBJEXT@: cmdline.c rabbitsign.h internal.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/cmdline.c
+
+error.@OBJEXT@: error.c rabbitsign.h internal.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/error.c
+
+graphlink.@OBJEXT@: graphlink.c rabbitsign.h internal.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/graphlink.c
+
+header.@OBJEXT@: header.c rabbitsign.h internal.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/header.c
+
+input.@OBJEXT@: input.c rabbitsign.h internal.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/input.c
+
+keys.@OBJEXT@: keys.c rabbitsign.h internal.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/keys.c
+
+mem.@OBJEXT@: mem.c rabbitsign.h internal.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/mem.c
+
+os8x.@OBJEXT@: os8x.c rabbitsign.h internal.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/os8x.c
+
+output.@OBJEXT@: output.c rabbitsign.h internal.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/output.c
+
+output8x.@OBJEXT@: output8x.c rabbitsign.h internal.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/output8x.c
+
+output9x.@OBJEXT@: output9x.c rabbitsign.h internal.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/output9x.c
+
+program.@OBJEXT@: program.c rabbitsign.h internal.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/program.c
+
+rabin.@OBJEXT@: rabin.c rabbitsign.h internal.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/rabin.c
+
+rsa.@OBJEXT@: rsa.c rabbitsign.h internal.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/rsa.c
+
+typestr.@OBJEXT@: typestr.c rabbitsign.h internal.h mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(GMP_CFLAGS) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/typestr.c
+
+
+md5.@OBJEXT@: md5.c md5.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/md5.c
+sha256.@OBJEXT@: sha256.c sha256.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/sha256.c
+
+
+mpz.@OBJEXT@: mpz.c mpz.h ../config.h
+	$(CC) -I.. -I$(srcdir) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $(srcdir)/mpz.c
+
+
+clean:
+	rm -f rabbitsign@EXEEXT@
+	rm -f packxxk@EXEEXT@
+	rm -f rskeygen@EXEEXT@
+	rm -f librabbitsign.a
+	rm -f *.@OBJEXT@
+
+install: rabbitsign@EXEEXT@ packxxk@EXEEXT@ @opt_install_rskeygen@
+	$(INSTALL) -d -m 755 $(DESTDIR)$(bindir)
+	$(INSTALL) -m 755 rabbitsign@EXEEXT@ $(DESTDIR)$(bindir)
+	$(INSTALL) -m 755 packxxk@EXEEXT@ $(DESTDIR)$(bindir)
+
+install-rskeygen: rskeygen@EXEEXT@
+	$(INSTALL) -d -m 755 $(DESTDIR)$(bindir)
+	$(INSTALL) -m 755 rskeygen@EXEEXT@ $(DESTDIR)$(bindir)
+
+uninstall:
+	rm -f $(DESTDIR)$(bindir)/rabbitsign@EXEEXT@
+	rm -f $(DESTDIR)$(bindir)/packxxk@EXEEXT@
+	rm -f $(DESTDIR)$(bindir)/rskeygen@EXEEXT@

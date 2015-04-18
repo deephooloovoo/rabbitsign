@@ -1,0 +1,41 @@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+datarootdir = @datarootdir@
+bindir = @bindir@
+datadir = @datadir@
+mandir = @mandir@
+app_key_dir = ${datadir}/rabbitsign
+
+INSTALL = @INSTALL@
+SHELL = /bin/sh
+
+@SET_MAKE@
+srcdir = @srcdir@
+VPATH = @srcdir@
+
+all: rabbitsign.pdf packxxk.pdf rskeygen.pdf
+
+rabbitsign.pdf: rabbitsign.1
+	man -t $(srcdir)/rabbitsign.1 > rabbitsign.ps
+	ps2pdf rabbitsign.ps
+
+packxxk.pdf: packxxk.1
+	man -t $(srcdir)/packxxk.1 > packxxk.ps
+	ps2pdf packxxk.ps
+
+rskeygen.pdf: rskeygen.1
+	man -t $(srcdir)/rskeygen.1 > rskeygen.ps
+	ps2pdf rskeygen.ps
+
+install:
+	$(INSTALL) -d -m 755 $(DESTDIR)$(mandir)/man1
+	$(INSTALL) -m 644 $(srcdir)/rabbitsign.1 $(DESTDIR)$(mandir)/man1
+	$(INSTALL) -m 644 $(srcdir)/packxxk.1 $(DESTDIR)$(mandir)/man1
+	$(INSTALL) -m 644 $(srcdir)/rskeygen.1 $(DESTDIR)$(mandir)/man1
+
+uninstall:
+	rm -f $(DESTDIR)$(mandir)/man1/rabbitsign.1
+	rm -f $(DESTDIR)$(mandir)/man1/packxxk.1
+	rm -f $(DESTDIR)$(mandir)/man1/rskeygen.1
+
+.PHONY: all install uninstall

@@ -1,0 +1,360 @@
+'\" e
+.TH rabbitsign 1 "July 2009" "RabbitSign 2.0"
+.if t \{
+.EQ
+delim $$
+.EN
+\}
+.SH NAME
+rabbitsign \- sign applications for TI graphing calculators
+.SH SYNOPSIS
+\fBrabbitsign\fR [ \fIoptions\fR ] [ \fB-o \fIappfile\fR ]
+[ \fB-k \fIkeyfile\fR ] \fIhexfile\fR ...
+
+\fBrabbitsign\fR [ \fIoptions\fR ] [ \fB-k \fIkeyfile\fR ]
+\fB-c\fR \fIhexfile\fR ...
+
+.SH DESCRIPTION
+\fBrabbitsign\fR is an implementation of Texas Instruments' Rabin and
+RSA signing algorithms, as used on the TI-73, TI-83 Plus, TI-84 Plus,
+TI-89, and TI-92 Plus graphing calculators.  These algorithms are used
+to sign Flash applications and operating systems so that the
+calculator can recognize them as valid.
+
+\fBrabbitsign\fR, like Texas Instruments' official signing programs,
+needs a private key (a pair of large prime numbers) to sign apps.  In
+order for the app to be accepted, the corresponding public key (their
+product) must be present on the calculator.  As of this writing, the
+``shareware'' private key number 0104, used for signing applications
+for the TI-83 Plus and TI-84 Plus, is available through TI's SDK.
+Unfortunately, the OS signing keys, as well as the app signing keys
+for the TI-73, TI-89, and TI-92 Plus, have not been released, which
+means that only TI can sign apps and OSes for those calculators.
+
+.SS OPTIONS
+.TP
+\fB-a\fR
+Attempt to match the output of Peter-Martijn Kuipers' \fBappsign\fR
+program, for testing purposes.  The resulting output file will have
+Unix-style line termination, and hence will not be compatible with all
+programs.  This option is not recommended for ordinary use.
+.TP
+\fB-b\fR
+Assume input files are raw binary files.  If this option is not given,
+the file type is detected automatically.
+.TP
+\fB-c\fR
+Do not sign apps; instead, check that the signatures of the specified
+apps are valid.  Exit status is 0 if all apps are valid, 1 if one or
+more apps fail, or 2 if there is a non-mathematical error.
+.TP
+\fB-f\fR
+Ignore non-fatal errors, and force the application to be signed if
+possible.  (All of these messages are there for a reason, though, and
+chances are that if your app generates any of them, it will also
+either fail validation or crash the calculator.  You have been
+warned.)
+.TP
+\fB-g\fR
+Write the output file in GraphLink ``TIFL'' format.  (By default and
+for historical reasons, apps and OSes for the TI-73 and TI-83 Plus are
+written in plain TI Hex format instead; you can use \fBpackxxk\fR(1)
+to convert these files into TIFL format.)  Apps and OSes for the TI-89
+and TI-92 Plus are always written in TIFL format.  See \fBAPPLICATION
+FILE FORMATS\fR below for more information.
+.TP
+\fB-k\fR \fIkeyfile\fR
+Read signing and/or validation keys from the given file.  This file
+must be in one of the formats used by TI's SDK tools.  (See \fBKEY
+FILE FORMATS\fR below.)  By default, \fBrabbitsign\fR searches for the
+key named in the app header (for example, 0104.key for ``shareware''
+TI-83 Plus apps.)
+.TP
+\fB-K\fR \fIid\fR
+Search for the key with the given \fIid\fR (a small hexadecimal
+number) rather than the ID specified in the app header.
+.TP
+\fB-n\fR
+Attempt to sign the program as-is, without modifying the header.
+(This option may not produce a file that the calculator will actually
+accept; it is intended for testing and special-purpose signatures, not
+for ordinary app signing.)
+.TP
+\fB-o\fR \fIoutfile\fR
+Specify the output file.  By default, output files are named by taking
+the name of the input file, removing any suffix, and adding a `.app'
+or `.8xk' suffix depending on whether \fB-g\fR is specified.  (If the
+input file already has a `.app' or `.8xk' suffix, `-signed' is
+inserted, so `myapp.8xk' becomes `myapp-signed.8xk'.)
+
+If `-' is specified as an input file, that indicates the
+standard input, and the signed result is written by default to the
+standard output.
+.TP
+\fB-p\fR
+Fix the app pages header.  This is not done by default because an
+incorrect pages header is generally a sign of a much more serious
+problem.
+.TP
+\fB-P\fR
+If the application ends close to a page boundary, add an additional
+page to hold the signature.  (Application signatures on the TI-73 and
+TI-83 Plus are not allowed to span a page boundary.)  Keep in mind
+that this is extremely wasteful, as it consumes 16384 bytes of Flash
+to hold approximately 69 bytes of data; if your application is in this
+situation, you should consider trying to reduce its size slightly, or
+alternatively, adding more data to take advantage of the extra Flash
+page.
+.TP
+\fB-q\fR
+Do not print non-fatal warning messages.
+.TP
+\fB-r\fR
+Re-sign a previously signed app (i.e., discard the previous signature
+before signing.)
+.TP
+\fB-R\fR \fIn\fR
+For signing TI-73 and TI-83 Plus applications, use root number \fIn\fR
+.if t ($0 <= n <= 3$)
+.if !t (0 \(<= \fIn\fR \(<= 3)
+rather than the default, root number 0.  All four roots are valid,
+though distinct, signatures, so this option is mainly for debugging.
+
+Root 0 is computed so as to be congruent to
+.if t $m sup {left ( {p+1} over 4 right )}$ modulo \fIp\fR and
+.if t $m sup {left ( {q+1} over 4 right )}$ modulo \fIq\fR.
+.if !t \fIm\fR^[(\fIp\fR+1)/4] modulo \fIp\fR and
+.if !t \fIm\fR^[(\fIq\fR+1)/4] modulo \fIq\fR.
+Root 1 is the negation of root 0 modulo \fIp\fR, root 2 the negation
+modulo \fIq\fR, and root 3 the negation both modulo \fIp\fR and modulo
+\fIq\fR.
+
+This option has no effect when signing OSes or TI-89/92 Plus
+applications, which use the RSA algorithm rather than Rabin.
+.TP
+\fB-t\fR \fItype\fR
+Explicitly specify the type of program (e.g., `8xk' for a TI-83 Plus
+application, or `73u' for a TI-73 operating system.)  The default
+behavior is to infer the program type from the name of the input file.
+(If the input file does not have a recognized suffix, the type is
+guessed based on the contents of the program header.)
+.TP
+\fB-u\fR
+Disable automatic page detection, and assume input files are unsorted.
+This means that page boundaries must be defined explicitly.  (See
+\fBAPPLICATION FILE FORMATS\fR below.)  This option has no effect in
+binary (\fB-b\fR) mode.
+.TP
+\fB-v\fR
+Be verbose; print out the names of apps and their signatures as they
+are signed.  Use \fB-vv\fR for more detailed information about the
+computation.
+.TP
+\fB--help\fR
+Print out a summary of options.
+.TP
+\fB--version\fR
+Print out version information.
+
+.SH APPLICATION FILE FORMATS
+.SS Intel Hex
+Intel hex is a standard ASCII file format used by many PROM
+programmers, and a common assembler output format.  Each line (or
+``record'') consists of the following:
+
+:\fINNAAAATTDDDDDD...CC\fR
+.TP
+:
+The first character of the line is a colon; this is just used to
+identify the format.
+.TP
+\fINN\fR
+The next two characters are the number of data bytes on this line,
+written in uppercase ASCII hexadecimal.
+.TP
+\fIAAAA\fR
+The next four digits are the address of the data on this line.
+\fBrabbitsign\fR only looks at the low 14 bits of this value.
+.TP
+\fITT\fR
+These two digits identify the ``type'' of the record.  Intel hex
+defines several record types for various addressing models; the only
+types which are meaningful for TI calculators are types 00 (ordinary
+data) and 01 (end of file.)
+.TP
+\fIDD...\fR
+2*\fINN\fR hex digits follow, the actual data.
+.TP
+\fICC\fR
+Finally, the inverted checksum is added, so that adding up all the
+bytes on the line gives a total of zero modulo 256.  (As an extension,
+\fBrabbitsign\fR permits you to use two uppercase `X's in place of a
+checksum.)
+.PP
+Since the address is only 16 bits, this format cannot unambiguously
+represent applications larger than 64 kilobytes.  To enable multi-page
+applications to be created, \fBrabbitsign\fR attempts to detect page
+boundaries automatically, starting a new page for each field with a
+zero address.  Thus to create a multi-page app, you can simply
+concatenate several Intel Hex files, e.g.
+.IP
+cat page0.hex page1.hex | rabbitsign - -o complete.app
+.PP
+This will only work if the records are correctly sorted within each
+page.  (If the assembler does not generate records in order, you can
+sort the fields yourself using a command such as `sort -k1.8,1.9
+-k1.4,1.7'.)
+
+To turn off this automatic page detection, use the \fB-u\fR option.
+In this case, you must define page boundaries explicitly using the TI
+Hex format.
+
+.SS TI Hex
+``TI'' hex is an extension to Intel hex which provides unambiguous
+representation of multi-page apps.  It adds records of the form
+
+:0200000200\fINNCC\fR
+
+which indicate that subsequent data is placed on relative page number
+\fINN\fR.  (Keep in mind that the TI-83 and 84 Plus install
+applications ``backwards,'' so if relative page 0 is stored on
+absolute page 69, relative page 1 will be stored on absolute page 68,
+and so forth.)
+
+Some assemblers can generate multi-page data using type 4 records
+instead of type 2; \fBrabbitsign\fR treats these as equivalent to type
+2.
+
+For compatibility with other software which makes certain assumptions
+about the format, \fBrabbitsign\fR will write 32 bytes per line, and
+will end lines with a DOS-style carriage return and line feed.
+
+.SS GraphLink TIFL
+The standard (newer) GraphLink format consists of a 78-byte binary
+header which is added to the start of a hex or binary file.  The
+contents of this header are as follows:
+
+.TP
+0x00-07
+The string `**TIFL**'.
+.TP
+0x08
+The major version number (``App ID'') of the application.
+.TP
+0x09
+The minor version number (``App Build'') of the application.
+.TP
+0x0A
+Flags; apparently intended to indicate whether the contents of the
+file are binary (0) or TI Hex (1).  This value is not, however, set
+consistently by other software.
+.TP
+0x0B
+``Object Type'' field; apparently indicates something about the type
+of data.  Set to 0x88 in most TI-73 and TI-83 Plus files; set to 0 in
+TI-89 and TI-92 Plus files.
+.TP
+0x0C-0F
+Binary-coded decimal month (one byte), day (one byte), and year (two
+bytes, big endian) when the app was signed.
+.TP
+0x10
+Length of the app's name.
+.TP
+0x11-18
+Name of the app.
+.TP
+0x19-2F
+Reserved, always set to zero.
+.TP
+0x30
+Calculator type (0x73 = TI-83 Plus, 0x74 = TI-73, 0x88 = TI-92 Plus,
+0x98 = TI-89.)
+.TP
+0x31
+Type of data (0x23 = OS upgrade, 0x24 = application, 0x25 = certificate.)
+.TP
+0x32-49
+Reserved, always set to zero.
+.TP
+0x4A-4D
+Little endian length of the following data (the length of the hex
+file, not the on-calculator size of the application.)
+.PP
+There also exist multi-part TIFL files, which simply consist of two or
+more TIFL files concatentated together.  (For instance, a software
+license agreement or a certificate file can be attached to an
+application.)  \fBrabbitsign\fR handles these files in a limited way:
+it will read only the first section with a recognized data type,
+ignoring any other data in the file.  \fBrabbitsign\fR cannot create
+multi-part TIFL files, but they can be created using \fBpackxxk\fR(1)
+(or simply using \fBcat\fR(1).)
+
+.SS Binary
+\fBrabbitsign\fR can also read binary app files; they are assumed to
+be contiguous, so when signing a multi-page app, each page except the
+last must be filled to a full 16k.
+
+.SH KEY FILE FORMATS
+Key files contain the data needed for signing and validating
+applications.  (The portion of the key file used for validating is
+known as the ``public'' key; the portion used for signing is the
+``private'' key.  Only the public key is stored on the calculator
+itself.)  Official key files from TI come in two varieties, known as
+``Rabin'' and ``RSA'' formats.  Note that \fBrabbitsign\fR currently
+supports using Rabin-type key files to generate RSA signatures, but
+not the other way around.
+
+.SS Rabin key format
+The Rabin key file format is typically used for TI-73 and TI-83 Plus
+application signing keys.  It consists of three lines, each containing
+a big integer.  The first line is the public key, \fIn\fR; the second
+and third are its two factors, \fIp\fR and \fIq\fR.
+
+Each line begins with two hexadecimal digits, giving the length of the
+number in bytes, followed by the bytes themselves, written in
+hexadecimal in little-endian order.
+
+.SS RSA key format
+The RSA key file format is typically used for TI-89 and TI-92 Plus
+application signing keys.  It consists of three lines: the key ID, the
+public key \fIn\fR, and the signing exponent \fId\fR.  (\fId\fR is the
+inverse of the validation exponent, 17,
+.if t modulo $phi (n)$,
+.if !t modulo \(*f(\fIn\fR),
+and thus calculating \fId\fR is computationally equivalent to
+factoring \fIn\fR.)
+
+The key ID is a short hexadecimal number, which should match the
+contents of the 811x header field.  The numbers \fIn\fR and \fId\fR
+are written as big integers, as in the Rabin key format.
+
+.SH FILES
+.TP
+/usr/local/share/rabbitsign/*.key
+Private key files which will be used if the requested key is not found
+in the current directory.
+
+.SH BUGS
+Who needs them?
+
+\fBrabbitsign\fR accepts keys, applications, and even file names which
+cause TI's programs to crash or generate invalid signatures.
+
+Some apps which come very close to filling the last page may not be
+usable with TI-Connect.  This is a bug in TI-Connect.  Try TiLP.
+
+\fBrabbitsign\fR does not always generate the same signature as do
+TI's programs.  This is not a bug; it is simply due to the differences
+in implementation.  There are in fact four valid signatures for every
+application hash; all four are accepted by the calculator.
+
+If you encounter a valid app which \fBrabbitsign\fR is unable to sign,
+or worse, generates an invalid signature, this is a serious bug, and I
+would like to know about it.
+
+.SH SEE ALSO
+\fBpackxxk\fR(1), \fBrskeygen\fR(1)
+
+.SH AUTHOR
+Benjamin Moody <floppusmaximus@users.sf.net>

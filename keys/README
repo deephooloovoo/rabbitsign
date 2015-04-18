@@ -1,0 +1,5 @@
+The key files in this directory are provided just in case they are
+useful to somebody; RabbitSign no longer requires them to be present,
+as they are included in the library.  You can still use your own key
+files, of course; just copy them to /usr/local/share/rabbitsign/, or
+to the directory where you're building your application.

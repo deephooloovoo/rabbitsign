@@ -1,0 +1,90 @@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+datarootdir = @datarootdir@
+bindir = @bindir@
+datadir = @datadir@
+mandir = @mandir@
+app_key_dir = ${datadir}/rabbitsign
+
+CC = @CC@
+CFLAGS = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@
+DEFS = @DEFS@
+LDFLAGS = @LDFLAGS@
+SHELL = /bin/sh
+
+@SET_MAKE@
+srcdir = @srcdir@
+VPATH = @srcdir@
+
+check: check-rabbitsign
+
+# Rabbitsign-only tests
+#
+# 1 - Generate a random key and random app, sign and check
+#
+# 2 - Unpack official 0104 key, generate a random app, sign and check
+#
+# 3 - Sign and check the included sample.hex, and check that the
+#     signature matches the provided one.
+#
+check-rabbitsign: randapp@EXEEXT@
+	cd ../src && $(MAKE) rabbitsign@EXEEXT@ rskeygen@EXEEXT@
+	$(TEST_EXEC) ../src/rskeygen --ti >1234.key
+	$(srcdir)/test-rabbitsign.sh 1234
+	$(TEST_EXEC) ../src/rskeygen --ti >1234.key
+	$(srcdir)/test-rabbitsign.sh 1234
+	$(TEST_EXEC) ../src/rskeygen >1201.key
+	$(srcdir)/test-rabbitsign.sh 1201
+	$(TEST_EXEC) ../src/rskeygen >1202.key
+	$(srcdir)/test-rabbitsign.sh 1202
+	$(TEST_EXEC) ../src/rskeygen >1203.key
+	$(srcdir)/test-rabbitsign.sh 1203
+	$(TEST_EXEC) ../src/rskeygen >1204.key
+	$(srcdir)/test-rabbitsign.sh 1204
+	rm -f 1234.key 1201.key 1202.key 1203.key 1204.key
+#	cp $(srcdir)/../keys/0104.key .
+	$(srcdir)/test-rabbitsign.sh 0104
+	$(srcdir)/test-rabbitsign.sh 0104
+	@echo "Testing the sample app..."
+	$(TEST_EXEC) ../src/rabbitsign -a $(srcdir)/sample.hex -o sample.app
+	$(TEST_EXEC) ../src/rabbitsign -c sample.app
+	diff sample.app $(srcdir)/sample-a.app
+#	rm -f 0104.key
+
+# Rabbitsign with appsign tests
+#
+# (obviously, these require a system compatible with appsign)
+#
+# 1 - Generate a random key (named 0104 because appsign is broken) and
+#     random app, sign with appsign, check with rabbitsign, sign and
+#     check with rabbitsign, and check that one of rabbitsign's four
+#     signatures matches appsign's.
+#
+# 2 - Unpack official 0104 key, generate a random app, sign with
+#     appsign, check with rabbitsign, sign and check with rabbitsign,
+#     and check that one of rabbitsign's four signatures matches
+#     appsign's.
+#
+check-appsign: randapp@EXEEXT@
+	cd ../src && $(MAKE) rabbitsign@EXEEXT@ rskeygen@EXEEXT@
+	../src/rskeygen --ti >0104.key
+	$(srcdir)/test-appsign.sh
+	../src/rskeygen --ti >0104.key
+	$(srcdir)/test-appsign.sh
+	cp $(srcdir)/../keys/0104.key .
+	$(srcdir)/test-appsign.sh
+	$(srcdir)/test-appsign.sh
+	rm -f 0104.key appsign.tmp testing.txt
+
+randapp@EXEEXT@: randapp.c
+	$(CC) -I.. $(CFLAGS) $(CPPFLAGS) $(DEFS) $(LDFLAGS) $(srcdir)/randapp.c -o randapp@EXEEXT@
+
+clean:
+	rm -f 12*.key 0104.key appsign.tmp testing.txt
+	rm -f test.8xk test.sig test.app test.hex testas.app
+	rm -f testr0.app testr1.app testr2.app testr3.app
+	rm -f sample.app
+	rm -f randapp@EXEEXT@
+
+.PHONY: check check-rabbitsign check-appsign clean
