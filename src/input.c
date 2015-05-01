@@ -94,8 +94,9 @@ static void guess_type(RSProgram* prgm, int is_hex)
 	prgm->datatype = RS_DATA_OS;
 	break;
       case 0x13:
+      case 0x37: 
     prgm->keytype = RS_KEY_SHA256;
-    prgm->calctype = RS_CALC_TI83P;
+    prgm->calctype = RS_CALC_TI89;
     prgm->datatype = RS_DATA_OS;
     break;
 
@@ -124,9 +125,10 @@ static void guess_type(RSProgram* prgm, int is_hex)
       case 0x08:
 	prgm->calctype = RS_CALC_TI92P;
 	break;
+      case 0x37: // freeware signing key
       case 0x13:
     prgm->keytype = RS_KEY_SHA256;
-    prgm->calctype = RS_CALC_TI83P;
+    prgm->calctype = RS_CALC_TI92P;
     prgm->datatype = RS_DATA_APP;
     break;
       }
@@ -200,11 +202,7 @@ static int read_file_binary(RSProgram* prgm,
     } while (count > 0);
   }
   rs_get_field_size(prgm->data, &fieldstart, &fieldsize);
-  //prgm->length=fieldsize+fieldstart;
-  //prgm->signature=prgm->data+fieldsize+fieldstart;
-  //rs_get_field_size(prgm->signature, &fieldstart, &fieldsize);
-  //prgm->signature_length=fieldsize+fieldstart;
-  if (!prgm->calctype || !prgm->datatype)
+  //if (!prgm->calctype || !prgm->datatype)
     guess_type(prgm, 0);
   return RS_SUCCESS;
 }
