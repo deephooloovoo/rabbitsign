@@ -120,6 +120,7 @@ typedef struct _RSProgram {
   unsigned long length_a;        /* Size of buffer allocated */
 
   /* Additional metadata (only used by TI-8x OS) */
+  unsigned char version;         /* OS header version */
   unsigned char* header;         /* OS header */
   unsigned int header_length;    /* Length of OS header */
   unsigned char* signature;      /* OS signature */

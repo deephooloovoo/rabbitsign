@@ -51,6 +51,7 @@
  */
 int rs_write_tifl_header(FILE* outfile,    /* file to write to */
 			 int is_hex,	    /* is file in hex format? */
+             int is_ce,     /* is the header in the CE format */
 			 int major,	    /* major version # */
 			 int minor,	    /* minor version # */
 			 int month,	    /* current month */
@@ -72,14 +73,15 @@ int rs_write_tifl_header(FILE* outfile,    /* file to write to */
   buf[8] = major;
   buf[9] = minor;
 
-  if (is_hex) {
-    buf[10] = 0x01;
-    buf[11] = 0x88;
-  }
-  else {
+  if (is_ce) {
     buf[73] = 0x13;
     buf[10] = 0;
     buf[11] = 0;
+    buf[9]  = 0x5;
+  }
+  else {
+    buf[10] = 0x01;
+    buf[11] = 0x88;
   }
 
   if (!month && !day && !year) {
@@ -100,10 +102,13 @@ int rs_write_tifl_header(FILE* outfile,    /* file to write to */
     buf[16] = 8;
 
   strncpy((char*) buf + 17, name, 8);
-
-  buf[48] = calctype;
+  if (is_ce) {
+    buf[48] = RS_CALC_TI83P;
+  } else {
+    buf[48] = calctype;
+  }
   buf[49] = datatype;
-
+  
   buf[74] = filesize & 0xff;
   buf[75] = (filesize >> 8) & 0xff;
   buf[76] = (filesize >> 16) & 0xff;

@@ -80,7 +80,7 @@ int rs_write_ti9x_file(const RSProgram* prgm, /* program */
   /* Note: the "version" header fields used in TI's 68k apps and
      OSes seem to have no relation to the actual version numbers. */
 
-  if ((e = rs_write_tifl_header(outfile, 0, 0, 0,
+  if ((e = rs_write_tifl_header(outfile, 0, prgm->keytype==RS_KEY_SHA256,0, 0,
 				month, day, year, name,
 				prgm->calctype, prgm->datatype,
 				prgm->length)))

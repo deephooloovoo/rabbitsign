@@ -31,14 +31,14 @@
 int rs_repair_program(RSProgram* prgm,	  /* app to repair */
 		      unsigned int flags) /* flags */
 {
-  if (rs_calc_is_ti8x(prgm->calctype)) {
+  if (rs_calc_is_ti8x(prgm->calctype)&& prgm->keytype==RS_KEY_MD5) {
     if (prgm->datatype == RS_DATA_OS)
       return rs_repair_ti8x_os(prgm, flags);
     else if (prgm->datatype == RS_DATA_APP)
       return rs_repair_ti8x_app(prgm, flags);
   }
 
-  if (rs_calc_is_ti9x(prgm->calctype)) {
+  if ( rs_calc_is_ti9x(prgm->calctype)|| prgm->keytype!=RS_KEY_MD5 ) {
     if (prgm->datatype == RS_DATA_OS)
       return rs_repair_ti9x_os(prgm, flags);
     else if (prgm->datatype == RS_DATA_APP)
@@ -57,7 +57,7 @@ int rs_sign_program(RSProgram* prgm, /* app to sign */
 		    RSKey* key,      /* signing key */
 		    int rootnum)     /* signature number */
 {
-  if (rs_calc_is_ti8x(prgm->calctype)) {
+  if (rs_calc_is_ti8x(prgm->calctype)&&prgm->keytype==RS_KEY_MD5) {
     if (prgm->datatype == RS_DATA_OS)
       return rs_sign_ti8x_os(prgm, key);
     else if (prgm->datatype == RS_DATA_APP)
@@ -73,7 +73,7 @@ int rs_sign_program(RSProgram* prgm, /* app to sign */
 int rs_validate_program(const RSProgram* prgm, /* app to validate */
 			const RSKey* key)      /* signing key */
 {
-  if (rs_calc_is_ti8x(prgm->calctype)) {
+  if (rs_calc_is_ti8x(prgm->calctype)&&prgm->keytype==RS_KEY_MD5) {
     if (prgm->datatype == RS_DATA_OS)
       return rs_validate_ti8x_os(prgm, key);
     else if (prgm->datatype == RS_DATA_APP)

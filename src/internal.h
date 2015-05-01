@@ -55,7 +55,7 @@ RSStatus rs_validate_rsa (const mpz_t sig, const mpz_t hash,
 /**** TIFL file output (graphlink.c) ****/
 
 /* Write TIFL header to a file. */
-RSStatus rs_write_tifl_header (FILE* f, int is_hex, int major, int minor,
+RSStatus rs_write_tifl_header (FILE* f, int is_hex, int is_ce, int major, int minor,
 			       int month, int day, int year,
 			       const char* name, int calctype, int datatype,
 			       unsigned long filesize);
